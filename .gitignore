@@ -10,6 +10,3 @@ captures/
 
 # 引入语音功能前的老版本备份，不进仓库
 app/src/main/backup_before_voice/
-
-# 未使用的离线语音模型（约 65MB，当前代码未引用），不进仓库
-app/src/main/assets/model/

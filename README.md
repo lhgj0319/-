@@ -1,0 +1,98 @@
+# ESP32 蓝牙小车遥控（Android Studio 工程）
+
+手机通过**经典蓝牙（SPP 串口）**连接小车上的 **ESP32（BluetoothSerial）**，
+用屏幕上的方向键发送指令控制小车前进 / 后退 / 左转 / 右转。**横屏使用**。
+
+本仓库同时包含手机 App（Android）和已适配好的小车固件（ESP32 Arduino）。
+
+## 硬件连接（L298N 电机驱动）
+
+| ESP32 引脚 | 接 L298N |
+|-----------|----------|
+| GPIO25 | IN1 |
+| GPIO26 | IN2 |
+| GPIO27 | IN3 |
+| GPIO14 | IN4 |
+| GPIO16 | ENA（左轮 PWM） |
+| GPIO17 | ENB（右轮 PWM） |
+
+## 固件（小车端）
+
+文件：`firmware/esp32_car/esp32_car.ino`
+
+- 蓝牙名称：**ESP32_Car**，经典蓝牙 SPP（`BluetoothSerial`），配对密码默认 `1234`
+- 指令：`F` 前进 / `B` 后退 / `L` 左转 / `R` 右转 / `S` 停止
+- **状态机模式**：收到指令后一直执行，直到收到下一条指令（或 `S`）才改变动作
+- 固件逐字符读取并**忽略换行符**，所以 App 端无需（也没有）换行选项
+- 上电后自检：前进 2 秒后停止
+
+烧录方式：Arduino IDE 打开 `firmware/esp32_car/esp32_car.ino`，开发板选
+"ESP32 Dev Module"（需安装 esp32 板包），直接上传。
+
+> 注意：`ledcAttach(pin, freq, res)` 返回 PWM 通道号是 **ESP32 Arduino 核心 2.x** 的写法。
+> 若你安装的是核心 **3.x**，`ledcAttach` 改为返回 `bool`、`ledcWrite` 直接传引脚号，
+> 需要把固件改成 `ledcAttach(ENA, 5000, 8); ledcWrite(ENA, 250);` 的形式。
+
+## App 指令表
+
+| 按键 | 指令 | 含义 |
+|------|------|------|
+| 前进 | `F` | 小车前进 |
+| 后退 | `B` | 小车后退 |
+| 左转 | `L` | 小车左转 |
+| 右转 | `R` | 小车右转 |
+| 停止 | `S` | 停止 |
+
+指令字与固件完全对应，无需修改；想改只需同时改
+`MainActivity.java` 顶部常量（`CMD_*`）和固件里的 `strchr("FBRLS", c)`。
+
+## App 功能（已针对状态机固件适配）
+
+- 横屏锁定（`sensorLandscape`，左右横屏均可）
+- 一键列出已配对蓝牙设备，也可搜索新设备
+- **按住连发**（120ms 间隔）
+- **松开自动停止**（默认开启）：松手即发 `S`——对状态机固件来说必须开启，否则小车会一直跑
+- **断开连接前自动补发停止指令**：点断开或退出 App 时先发 `S` 再关连接，防止小车继续行驶
+- 实时显示小车回传数据（调试用）
+- 兼容 Android 6 ~ 14 的蓝牙权限申请逻辑
+- 屏幕常亮，控制时不息屏
+
+## 如何导入运行
+
+1. 打开 **Android Studio**（建议 2023.1+，自带 JDK 17）
+2. `File → Open`，选择本工程的 `BluetoothCarController` 目录
+3. 等待 Gradle 同步完成（首次会自动下载 Gradle 8.7，需要联网；
+   若提示安装 SDK Platform 34，按提示安装）
+4. 手机开启**开发者选项 + USB 调试**，数据线连接电脑
+5. 点 ▶ Run 安装到手机
+
+## 使用步骤
+
+1. 小车固件烧录并上电（蓝牙名 `ESP32_Car`）
+2. 手机系统设置里打开蓝牙，先与 `ESP32_Car` **配对**（密码 `1234`）
+3. 打开 App → 点“连接蓝牙”→ 在列表中选择 `ESP32_Car`
+4. 按住方向键控制小车；松开自动发送停止
+5. 用完后点“断开连接”（App 会先发停止再断开）
+
+> 注意：
+> - 首次使用会弹出蓝牙/定位权限申请，全部允许
+> - Android 12+ 需要在“设置→蓝牙”里开启“附近设备”权限
+> - 若你的蓝牙模块是 **HC-05 / HC-06** 等经典模块，本 App 同样适用（指令一致）
+
+## 工程结构
+
+```
+BluetoothCarController/
+├── settings.gradle / build.gradle / gradle.properties
+├── gradle/wrapper/                  # Gradle Wrapper（版本 8.7）
+├── firmware/esp32_car/esp32_car.ino # ESP32 小车固件（已适配）
+└── app/
+    ├── build.gradle                 # compileSdk 34, minSdk 21, 纯系统 API 无三方依赖
+    └── src/main/
+        ├── AndroidManifest.xml
+        ├── java/com/example/btcarcar/MainActivity.java   # 全部逻辑
+        └── res/
+            ├── layout/activity_main.xml                  # 横屏方向盘界面
+            ├── values/strings.xml / styles.xml / themes.xml
+            └── drawable/bg_direction.xml / bg_stop.xml   # 圆形按钮
+```

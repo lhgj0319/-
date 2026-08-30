@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F3F7"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- 顶栏：标题 / 状态 / 连接按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="蓝牙小车遥控"
+            android:textColor="#1F2329"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="未连接"
+            android:textColor="#D64545"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/connectBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:minWidth="100dp"
+            android:text="连接蓝牙" />
+    </LinearLayout>
+
+    <!-- 第二行：设备名 / 选项 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/deviceText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="未选择设备"
+            android:textColor="#6B7280"
+            android:textSize="13sp" />
+
+        <CheckBox
+            android:id="@+id/autoStopCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="松开自动停止"
+            android:textColor="#1F2329"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/commandInput"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="#F3F6FA"
+            android:hint="前进2米 或 跑3秒"
+            android:inputType="text"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="#1F2937"
+            android:textColorHint="#91A0B2"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/sendCmdBtn"
+            style="@style/CommandButton"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="6dp"
+            android:text="发送" />
+
+    </LinearLayout>
+
+    <!-- 方向盘：语音在中心，停止在最下面 -->
+    <GridLayout
+        android:id="@+id/pad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:columnCount="3"
+        android:rowCount="4">
+
+        <Button
+            android:id="@+id/btnUp"
+            style="@style/PadButton"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:text="▲\n前进" />
+
+        <Button
+            android:id="@+id/btnLeft"
+            style="@style/PadButton"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:text="◀\n左转" />
+
+        <Button
+            android:id="@+id/voiceBtn"
+            style="@style/VoiceButton"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_margin="6dp"
+            android:layout_column="1"
+            android:layout_row="1"
+            android:text="🎙\n语音" />
+
+        <Button
+            android:id="@+id/btnRight"
+            style="@style/PadButton"
+            android:layout_column="2"
+            android:layout_row="1"
+            android:text="▶\n右转" />
+
+        <Button
+            android:id="@+id/btnDown"
+            style="@style/PadButton"
+            android:layout_column="1"
+            android:layout_row="2"
+            android:text="▼\n后退" />
+
+        <Button
+            android:id="@+id/btnStop"
+            style="@style/PadButtonStop"
+            android:layout_width="220dp"
+            android:layout_height="25dp"
+            android:layout_margin="6dp"
+            android:layout_column="0"
+            android:layout_columnSpan="3"
+            android:layout_gravity="center_horizontal"
+            android:layout_row="3"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="停止" />
+
+    </GridLayout>
+
+    <!-- 收发日志 -->
+    <TextView
+        android:id="@+id/logText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        android:textColor="#374151"
+        android:textSize="12sp" />
+
+</LinearLayout>
